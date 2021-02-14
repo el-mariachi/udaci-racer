@@ -1,9 +1,14 @@
 {
   "name": "pod_racer_sim",
   "version": "1.0.0",
+  "private": true,
   "description": "Racing simulator for Pod Racers",
   "main": "index.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:el-mariachi/udaci-racer.git"
+  },
   "scripts": {
     "start": "node src/server/index.js"
   },

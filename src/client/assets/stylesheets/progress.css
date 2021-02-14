@@ -3,6 +3,7 @@
 /* -------------------  MOBILE  --------------------- */
 header {
   background-image: url('https://via.placeholder.com/1150');
+  background-image: url('../f1.jpg');
 }
 
 main#two-columns {
@@ -22,6 +23,10 @@ section#accelerate button {
     background-color: green;
     border-color: rgb(14, 166, 6);
     cursor: pointer;
+}
+
+section#accelerate button:focus {
+    outline: none;
 }
 
 #big-numbers {
