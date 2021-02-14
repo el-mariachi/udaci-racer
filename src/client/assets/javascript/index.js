@@ -1,7 +1,7 @@
 // PROVIDED CODE BELOW (LINES 1 - 80) DO NOT REMOVE
 
 // The store will hold all information needed globally
-var store = {
+const store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
@@ -15,16 +15,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function onPageLoad() {
 	try {
-		getTracks()
-			.then(tracks => {
-				const html = renderTrackCards(tracks)
-				renderAt('#tracks', html)
-			})
-
-		getRacers()
-			.then((racers) => {
-				const html = renderRacerCars(racers)
-				renderAt('#racers', html)
+		Promise.all([getTracks(), getRacers()])
+			.then(([tracks, racers]) => {
+				renderAt('#tracks', renderTrackCards(tracks));
+				renderAt('#racers', renderRacerCars(racers));
 			})
 	} catch (error) {
 		console.log("Problem getting tracks and racers ::", error.message)
@@ -80,20 +74,23 @@ async function delay(ms) {
 async function handleCreateRace() {
 	// render starting UI
 	renderAt('#race', renderRaceStartView(store.track))
-
-	// Get player_id and track_id from the store
-
-	// invoke the API call to create the race, then save the result
-	const race = await createRace(store.player_id, store.track_id);
-	// update the store with the race id
-	Object.assign(store, { race_id: parseInt(race.ID) - 1 }); // - 1 is an undocumented bug. found solution in peer chat
-	// The race has been created, now start the countdown
-	// call the async function runCountdown
-	await runCountdown();
-	// call the async function startRace
-	await startRace(store.race_id);
-	// call the async function runRace
-	runRace(store.race_id);
+	try {
+		// invoke the API call to create the race, then save the result
+		const race = await createRace(store.player_id, store.track_id);
+		// update the store with the race id
+		Object.assign(store, { race_id: parseInt(race.ID) - 1 }); // - 1 is an undocumented bug. found solution in peer chat
+		// The race has been created, now start the countdown
+		// call the async function runCountdown
+		await runCountdown();
+		// call the async function startRace
+		await startRace(store.race_id);
+		// call the async function runRace
+		runRace(store.race_id);
+	} catch (err) {
+		console.log('There was a problem running the race');
+		console.log('Error:', err);
+		renderAt('#race', `<header><h1>Error running the race</h1></header>`)
+	}
 }
 
 function runRace(raceID) {
@@ -274,7 +271,7 @@ function resultsView(positions) {
 }
 
 function raceProgress(positions) {
-	let userPlayer = positions.find(e => e.id === store.player_id)
+	const userPlayer = positions.find(e => e.id === store.player_id)
 	userPlayer.driver_name += " (you)"
 
 	positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1)
